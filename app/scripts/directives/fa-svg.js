@@ -81,7 +81,11 @@ angular.module('famousAngularStarter')
                 }
                 t.set(6.28,  reset);
                 var mod = new Modifier();
-                mod.transformFrom(function(){return Transform.translate(bbox.x, bbox.y)})
+                var acc = 0;
+                mod.transformFrom(function(){
+                  acc += .05;
+                  return Transform.multiply(Transform.translate(bbox.x, bbox.y), Transform.rotateZ(acc)); 
+                })
                 var surf = new Surface({size: [bbox.width, bbox.height]});
                 var content = "<svg style='width: 100%; height: 100%;' viewBox='"+bbox.x + " " + bbox.y + " " + (bbox.width) + " " + (bbox.height) +"'>" + child.outerHTML + '</svg>'
                 console.log('content', content)
