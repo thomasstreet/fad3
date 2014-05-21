@@ -40,7 +40,6 @@
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
@@ -54,7 +53,6 @@
       //set requirejs's base to where the famous lib folder lives
       require.config({baseUrl: 'bower_components'});
     </script>
-    <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/famous-angular/dist/famous-angular.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
@@ -64,6 +62,7 @@
     <script src="scripts/main/main-ctrl.js"></script>
     <!-- inject:partials -->
     <!-- endinject -->
+    <script src="scripts/directives/fa-svg.js"></script>
     <!-- endbuild -->
 
   </body>
