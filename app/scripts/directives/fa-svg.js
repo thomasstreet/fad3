@@ -51,6 +51,7 @@ angular.module('famousAngularStarter')
 
               var surfaces = _.map(children, function(child){
                 var bbox = child.getBBox();
+                console.log('bbox', bbox)
 
                 // var bound = child.getBBox();
                 // console.log('bound', child)
@@ -80,9 +81,10 @@ angular.module('famousAngularStarter')
                 }
                 t.set(6.28,  reset);
                 var mod = new Modifier();
-                mod.transformFrom(function(){return Transform.scale(t.get(), t.get())})
+                mod.transformFrom(function(){return Transform.translate(bbox.x, bbox.y)})
                 var surf = new Surface({size: [bbox.width, bbox.height]});
-                var content = '<svg>' + child.outerHTML + '</svg>'
+                var content = "<svg style='width: 100%; height: 100%;' viewBox='"+bbox.x + " " + bbox.y + " " + (bbox.width) + " " + (bbox.height) +"'>" + child.outerHTML + '</svg>'
+                console.log('content', content)
                 surf.setContent(content);
                 var rn = new RenderNode;
                 rn.add(mod).add(surf);
