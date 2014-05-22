@@ -154,11 +154,11 @@ angular.module('famousAngularStarter')
                 for(var j = 0; j < particles.length; j++){
                   //add O(n^2) components
                   if(i != j){
-                    var attractId = engine.attach(
-                      repulsion,
-                      particles[i].particle,
-                      particles[j].particle
-                    );
+                    // var attractId = engine.attach(
+                    //   repulsion,
+                    //   particles[i].particle,
+                    //   particles[j].particle
+                    // );
                     // var attractId = engine.attach(
                     //   attraction,
                     //   particles[i].particle,
