@@ -81,32 +81,38 @@ angular.module('famousAngularStarter')
                   curve: 'linear'
                 }
                 t.set(6.28,  reset);
-                var mod = new Modifier();
+                var v = new Modifier({size: [bbox.width, bbox.height]})
+                var mod = new Modifier({origin: [.5, .5]});
+
                 var acc = 0;
 
                 mod.transformFrom(function(){
                   acc += .05;
-                  var posX = this.posX || (this.posX = 0)
-                  var posY = this.posY || (this.posY = 0)
+                  var posX = this.posX || (this.posX = bbox.x)
+                  var posY = this.posY || (this.posY = bbox.y)
+                  var posT = this.posT || (this.posT = 0)
                   var velX = this.velX || (this.velX = 0)
                   var velY = this.velY || (this.velY = 0)
+                  var velT = this.velT || (this.velT = 0)
                   this.posX += this.velX
                   this.posY += this.velY
+                  this.posT += this.velT
                   this.velY += Math.random()
                   this.velX += Math.random()
+                  this.velT += Math.random() / 15 
                   if(this.posX > 1300) this.velX *= -1
                   if(this.posY > 500) this.velY *= -1
                   // if(this.posX < 0 ) this.velX *= -1
                   // if(this.posY < 0) this.velY *= -1
-                  return Transform.multiply(Transform.translate(posX, posY), Transform.rotateY(0));
+                  return Transform.multiply(Transform.translate(posX, posY), Transform.rotateZ(posT));
                   // return Transform.translate(bbox.x, bbox.posY)
                 })
                 var surf = new Surface({size: [bbox.width, bbox.height]});
                 var content = "<svg style='width: 100%; height: 100%;' viewBox='"+bbox.x + " " + bbox.y + " " + (bbox.width) + " " + (bbox.height) +"'>" + child.outerHTML + '</svg>'
 
                 surf.setContent(content);
-                var rn = new RenderNode;
-                rn.add(mod).add(surf);
+                var rn = new RenderNode();
+                rn.add(v).add(mod).add(surf);
 
 
                 return rn;
