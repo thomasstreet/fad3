@@ -14,6 +14,14 @@ angular.module('famousAngularStarter')
         var View = $famous['famous/core/View'];
         var Transform = $famous['famous/core/Transform']
         var Transitionable = $famous['famous/transitions/Transitionable']
+        var PhysicsEngine = $famous['famous/physics/PhysicsEngine'];
+        var Particle = $famous['famous/physics/bodies/Particle'];
+        var Circle = $famous['famous/physics/bodies/Circle'];
+        var Repulsion = $famous['famous/physics/forces/Repulsion'];
+        var Rope = $famous['famous/physics/constraints/Distance'];
+        var Walls = $famous['famous/physics/constraints/Walls'];
+        var Collisions = $famous['famous/physics/constraints/Collision'];
+
 
         return {
           pre: function(scope, element, attrs){
@@ -32,6 +40,16 @@ angular.module('famousAngularStarter')
           post: function(scope, element, attrs){
             var isolate = $famousDecorator.ensureIsolate(scope);
             var svg;
+
+            var engine = new PhysicsEngine();
+
+            var invisibleCenterParticle = engine.addBody(
+              new Circle({
+                radius : 100,
+                position : [window.innerWidth / 2.0,window.innerHeight / 2.0,0]
+              })
+            );
+
             transclude(scope, function(clone) {
               var svg = clone;
               window.clone = clone;
@@ -50,56 +68,120 @@ angular.module('famousAngularStarter')
               var children = svg.children();
               console.log('children', children)
 
-              var surfaces = _.map(children, function(child){
+              var particles = _.map(children, function(child){
                 var bbox = child.getBBox();
                 console.log('bbox', bbox)
 
-                // var bound = child.getBBox();
-                // console.log('bound', child)
-                // var origPoints = child.attributes['points'].value.split(' ');
-                // var newPoints = _.map(origPoints, function(ordPair){
-                //   var nums = ordPair.split(',');
-                //   var newNums = [_width - nums[0], _height - nums[1]];
-                //   return newNums;
-                // });
-                // var newPointsStrings = _.map(newPoints, function(pt){
-                //   return pt[0] + ',' + pt[1];
-                // });
-                // var finalString = newPointsStrings.join(' ');
-                // console.log('origString', origPoints);
-                // console.log('finalString', finalString);
+                var radius = Math.max(bbox.width, bbox.height);
 
-                var t = new Transitionable(0);
-                var reset = function(){
-                  t.set(0)
-                  setTimeout(function(){
-                    t.set(6.28, reset);
-                  }, 0);
-                }
-                var transition = {
-                  duration: 2000,
-                  curve: 'linear'
-                }
-                t.set(6.28,  reset);
-                var mod = new Modifier();
-                var acc = 0;
-                mod.transformFrom(function(){
-                  acc += .05;
-                  return Transform.multiply(Transform.translate(bbox.x, bbox.y), Transform.rotateZ(acc)); 
-                })
+                var particle = engine.addBody(
+                  new Circle({
+                    radius : radius,
+                    position : [bbox.x,bbox.y,0]
+                  })
+                );
+
+                var repulsion = new Repulsion({
+                  strength        : .1,
+                  anchor          : undefined,
+                  radii           : { min : 0, max : radius },
+                  cutoff          : 0,
+                  cap             : Infinity,
+                  decayFunction   : Repulsion.DECAY_FUNCTIONS.GRAVITY
+                });
+
+                
                 var surf = new Surface({size: [bbox.width, bbox.height]});
                 var content = "<svg style='width: 100%; height: 100%;' viewBox='"+bbox.x + " " + bbox.y + " " + (bbox.width) + " " + (bbox.height) +"'>" + child.outerHTML + '</svg>'
                 console.log('content', content)
                 surf.setContent(content);
-                var rn = new RenderNode;
-                rn.add(mod).add(surf);
 
-
-                return rn;
+                return {particle: particle, surf: surf};
               })
 
-              _.each(surfaces, function(surf){
-                isolate.renderNode.add(surf);
+              var attraction = new Repulsion({
+                strength        : -1,
+                anchor          : undefined,
+                range           : [100, 100000],
+                cutoff          : 0,
+                cap             : Infinity,
+                decayFunction   : Repulsion.DECAY_FUNCTIONS.GRAVITY
+              });
+
+              var repulsion = new Repulsion({
+                strength        : .1,
+                anchor          : undefined,
+                radii           : { min : 0, max : 100 },
+                cutoff          : 0,
+                cap             : Infinity,
+                decayFunction   : Repulsion.DECAY_FUNCTIONS.GRAVITY
+              });
+
+              var strongAttraction = new Repulsion({
+                strength        : -2,
+                anchor          : undefined,
+                range           : [100, 100000],
+                cutoff          : 0,
+                cap             : Infinity,
+                decayFunction   : Repulsion.DECAY_FUNCTIONS.INVERSE
+              });
+
+              var collision = new Collisions({
+                restitution : .3,
+                drift: .1
+              });
+
+              for(var i = 0; i < particles.length; i++){
+                //add O(n) components
+                // this.engine.attach(
+                //   collision,
+                //   _.map(this.particles, function(p){return p.particle}),
+                //   this.particles[i].particle
+                // );
+
+                engine.attach(
+                  collision,
+                  _.map(particles, function(p){return p.particle}),
+                  particles[i].particle
+                );
+
+                engine.attach(
+                  strongAttraction,
+                  particles[i].particle,
+                  invisibleCenterParticle
+                );
+
+                for(var j = 0; j < particles.length; j++){
+                  //add O(n^2) components
+                  if(i != j){
+                    var attractId = engine.attach(
+                      repulsion,
+                      particles[i].particle,
+                      particles[j].particle
+                    );
+                    // var attractId = engine.attach(
+                    //   attraction,
+                    //   particles[i].particle,
+                    //   particles[j].particle
+                    // );
+
+                    // this.engine.attach(
+                    //   rope,
+                    //   this.particles[i].particle,
+                    //   this.particles[j].particle
+                    // );
+                  }
+                }
+              }
+
+
+
+
+
+              isolate.renderNode.add(engine);
+              
+              _.each(particles, function(part){
+                isolate.renderNode.add(part.particle).add(part.surf);
               });   
 
 
