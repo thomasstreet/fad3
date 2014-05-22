@@ -34,6 +34,7 @@ angular.module('famousAngularStarter')
             var svg;
             transclude(scope, function(clone) {
               var svg = clone;
+              window.clone = clone;
               svg.attr('opacity', 0)
               angular.element('body').append(clone);
 
