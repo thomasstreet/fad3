@@ -18,15 +18,15 @@ angular.module('famousAngularStarter')
         return {
           pre: function(scope, element, attrs){
             var isolate = $famousDecorator.ensureIsolate(scope);
-            
-            
+
+
             isolate.renderNode = new View({
               size: scope.$eval(attrs.faSize) || [undefined, undefined]
             });
 
 
             element.append('<div class="fad3-container"></div>');
-            
+
 
           },
           post: function(scope, element, attrs){
@@ -83,13 +83,26 @@ angular.module('famousAngularStarter')
                 t.set(6.28,  reset);
                 var mod = new Modifier();
                 var acc = 0;
+
                 mod.transformFrom(function(){
                   acc += .05;
-                  return Transform.multiply(Transform.translate(bbox.x, bbox.y), Transform.rotateZ(acc)); 
+                  var posX = this.posX || (this.posX = 0)
+                  var posY = this.posY || (this.posY = 0)
+                  var velX = this.velX || (this.velX = 0)
+                  var velY = this.velY || (this.velY = 0)
+                  this.posX += this.velX
+                  this.posY += this.velY
+                  this.velY += Math.random()
+                  this.velX += Math.random()
+                  if(this.posX > 1300) this.velX *= -1
+                  if(this.posY > 500) this.velY *= -1
+                  // if(this.posX < 0 ) this.velX *= -1
+                  // if(this.posY < 0) this.velY *= -1
+                  return Transform.multiply(Transform.translate(posX, posY), Transform.rotateY(0));
                 })
                 var surf = new Surface({size: [bbox.width, bbox.height]});
                 var content = "<svg style='width: 100%; height: 100%;' viewBox='"+bbox.x + " " + bbox.y + " " + (bbox.width) + " " + (bbox.height) +"'>" + child.outerHTML + '</svg>'
-                console.log('content', content)
+
                 surf.setContent(content);
                 var rn = new RenderNode;
                 rn.add(mod).add(surf);
@@ -100,23 +113,11 @@ angular.module('famousAngularStarter')
 
               _.each(surfaces, function(surf){
                 isolate.renderNode.add(surf);
-              });   
-
-
-
-
+              });
 
 
             });
-
-
-
-                     
-
-
             scope.$emit('registerChild', isolate);
-
-
           }
         }
       }
