@@ -99,6 +99,7 @@ angular.module('famousAngularStarter')
                   // if(this.posX < 0 ) this.velX *= -1
                   // if(this.posY < 0) this.velY *= -1
                   return Transform.multiply(Transform.translate(posX, posY), Transform.rotateY(0));
+                  // return Transform.translate(bbox.x, bbox.posY)
                 })
                 var surf = new Surface({size: [bbox.width, bbox.height]});
                 var content = "<svg style='width: 100%; height: 100%;' viewBox='"+bbox.x + " " + bbox.y + " " + (bbox.width) + " " + (bbox.height) +"'>" + child.outerHTML + '</svg>'
