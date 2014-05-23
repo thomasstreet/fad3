@@ -2,5 +2,7 @@
 
 angular.module('famousAngularStarter')
   .controller('MainCtrl', function ($scope) {
-    $scope.greeting = "Hello, Famo.us"
+    $scope.gridOptions = {
+      dimensions: [1,2]
+    };
   });
