@@ -38,6 +38,11 @@ angular.module('famousAngularStarter')
               svg.attr('opacity', 0)
               angular.element('body').append(clone);
 
+              var _state = false;
+              window.onclick = function(){
+                _state = true;
+              }
+
 
 
               window.svg = svg;
@@ -87,24 +92,28 @@ angular.module('famousAngularStarter')
                 var acc = 0;
 
                 mod.transformFrom(function(){
-                  acc += .05;
-                  var posX = this.posX || (this.posX = bbox.x)
-                  var posY = this.posY || (this.posY = bbox.y)
-                  var posT = this.posT || (this.posT = 0)
-                  var velX = this.velX || (this.velX = 0)
-                  var velY = this.velY || (this.velY = 0)
-                  var velT = this.velT || (this.velT = 0)
-                  this.posX += this.velX
-                  this.posY += this.velY
-                  this.posT += this.velT
-                  this.velY += Math.random()
-                  this.velX += Math.random()
-                  this.velT += Math.random() / 15 
-                  if(this.posX > 1300) this.velX *= -1
-                  if(this.posY > 500) this.velY *= -1
-                  // if(this.posX < 0 ) this.velX *= -1
-                  // if(this.posY < 0) this.velY *= -1
-                  return Transform.multiply(Transform.translate(posX, posY), Transform.rotateZ(posT));
+                  if(_state){
+                    acc += .05;
+                    var posX = this.posX || (this.posX = bbox.x)
+                    var posY = this.posY || (this.posY = bbox.y)
+                    var posT = this.posT || (this.posT = 0)
+                    var velX = this.velX || (this.velX = 0)
+                    var velY = this.velY || (this.velY = 0)
+                    var velT = this.velT || (this.velT = 0)
+                    this.posX += this.velX
+                    this.posY += this.velY
+                    this.posT += this.velT
+                    this.velY += Math.random()
+                    this.velX += Math.random()
+                    this.velT += (Math.random() - .5) / 150 
+                    if(this.posX > window.innerWidth - bbox.width) this.velX *= -1
+                    if(this.posY > window.innerHeight - bbox.height) this.velY *= -1
+                    // if(this.posX < 0 ) this.velX *= -1
+                    // if(this.posY < 0) this.velY *= -1
+                    return Transform.multiply(Transform.translate(posX, posY), Transform.rotateZ(posT));
+                  }else{
+                    return Transform.translate(bbox.x, bbox.y);
+                  }
                   // return Transform.translate(bbox.x, bbox.posY)
                 })
                 var surf = new Surface({size: [bbox.width, bbox.height]});
