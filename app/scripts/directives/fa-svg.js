@@ -110,7 +110,7 @@ angular.module('famousAngularStarter')
                     if(this.posY > window.innerHeight - bbox.height) this.velY *= -1
                     // if(this.posX < 0 ) this.velX *= -1
                     // if(this.posY < 0) this.velY *= -1
-                    return Transform.multiply(Transform.translate(posX, posY), Transform.rotateZ(posT));
+                    return Transform.multiply(Transform.translate(posX, posY), Transform.rotateZ(posT), Transform.scale(Math.max(1, velT), Math.max(1, velT), 1));
                   }else{
                     return Transform.translate(bbox.x, bbox.y);
                   }
