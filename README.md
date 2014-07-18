@@ -13,4 +13,6 @@ Applications:  integrate with SVG-based tools like d3, or work as the basis of a
 
 `npm install`
 
+`bower install`
+
 `gulp watch`
